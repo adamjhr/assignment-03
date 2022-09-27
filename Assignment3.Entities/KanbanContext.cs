@@ -7,9 +7,9 @@ namespace Assignment3.Entities;
 
 public class KanbanContext : DbContext
 {
+    public KanbanContext(DbContextOptions<KanbanContext> options) : base(options) {
+    }
     
-
-
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<Tag> Tags { get; set; }
@@ -33,14 +33,14 @@ public class KanbanContext : DbContext
 
     }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        var configuration = new ConfigurationBuilder()
-            .AddUserSecrets(typeof(KanbanContext).Assembly, true)
-            .Build();
-        var connectionString = configuration.GetConnectionString("ConnectionString");
+    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    // {
+    //     var configuration = new ConfigurationBuilder()
+    //         .AddUserSecrets(typeof(KanbanContext).Assembly, true)
+    //         .Build();
+    //     var connectionString = configuration.GetConnectionString("ConnectionString");
         
-        optionsBuilder.UseLazyLoadingProxies().UseNpgsql(connectionString);
+    //     optionsBuilder.UseLazyLoadingProxies().UseNpgsql(connectionString);
         
-    }
+    // }
 }

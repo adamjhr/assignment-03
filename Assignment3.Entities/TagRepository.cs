@@ -1,5 +1,6 @@
 using System.Diagnostics.Tracing;
 using Assignment3.Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace Assignment3.Entities;
 
