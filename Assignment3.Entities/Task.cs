@@ -19,7 +19,10 @@ public class Task
     public State State { get; set; }
 
     public virtual ICollection<Tag> Tags { get; set; }
+    
+    public DateTime CreatedDate { get; set; }
 
-
-
+    public  DateTime StateUpdated { get; set; }
+    
+    public User AssignedTo { get; set; }
 }

@@ -1,9 +1,11 @@
 using System.Collections.Immutable;
 using System.Diagnostics.Tracing;
 using Assignment3.Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace Assignment3.Entities;
 // mangler: Trying to delete a tag in use without the force should return Conflict.
+// Tags which are assigned to a task may only be deleted using the force.
 public class TagRepository : ITagRepository
 {
     private KanbanContext _context;
@@ -16,7 +18,6 @@ public class TagRepository : ITagRepository
     public (Response Response, int TagId) Create(TagCreateDTO tag)
     {   
         if (_context.Tags.Find(tag) != null) return (Response.Conflict, 0);
-        
         var t = _context.Tags.Add(new Tag());
         _context.SaveChanges();
         return (Response.Created, t.Entity.Id);
@@ -25,23 +26,19 @@ public class TagRepository : ITagRepository
 
     public IReadOnlyCollection<TagDTO> ReadAll()
     {
-        var list = new List<TagDTO>();
-        foreach (var tag in _context.Tags)
-        {
-            var dto = new TagDTO(tag.Id, tag.Name);
-            list.Add(dto);
-        }
-        
-
-        return list.ToImmutableList();
+        var queryResult = _context.Tags
+            .ToList();
+        var taskDTOs = queryResult.Select(t => new TagDTO(t.Id,t.Name)).ToImmutableList();
+        return taskDTOs;
 
     }
 
     public TagDTO Read(int tagId)
     {
-        var tag = _context.Tags.Find(tagId);
-       
-        return new TagDTO(tag.Id, tag.Name);
+        var tag = _context.Tags.SingleOrDefault(t => t.Id == tagId);
+        if (tag == null) return null;
+        
+        return new TagDTO(tag.Id,tag.Name);
 
     }
 
@@ -61,18 +58,35 @@ public class TagRepository : ITagRepository
 
     public Response Delete(int tagId, bool force = false)
     {
-        if (force)
-        {
-            if (_context.Tags.Find(tagId) != null)
-            {
-                _context.Tags.Remove(_context.Tags.Find(tagId));
-                _context.SaveChanges();
-            }
-
+        var tag = _context.Tags.Include(t => t.Tasks ).SingleOrDefault(t => t.Id == tagId );
+        if (tag == null)
             return Response.NotFound;
 
+        if (tag.Tasks.Any() && !force)
+            return Response.Conflict;
+
+        
+        if (force)
+        {
+            foreach (var t in tag.Tasks)
+            {
+                if (t.State == State.Active)
+                    return Response.Conflict;
+
+            }
+            foreach (var t in tag.Tasks)
+            {
+                t.Tags.Remove(tag);
+            }
         }
 
-        return Response.Conflict;
+        _context.Tags.Remove(tag);
+                _context.SaveChanges();
+            
+
+            return Response.NotFound;
+            
+
+        
     }
 }
