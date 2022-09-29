@@ -7,6 +7,7 @@ public class UserRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var userRepo = new UserRepository(context);
         
         var response = userRepo.Read(0);
@@ -19,6 +20,7 @@ public class UserRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var userRepo = new UserRepository(context);
         
         var response = userRepo.Update(new Core.UserUpdateDTO(0, "", ""));
@@ -31,6 +33,7 @@ public class UserRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var userRepo = new UserRepository(context);
         
         var response = userRepo.Delete(0);
@@ -43,6 +46,7 @@ public class UserRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var userRepo = new UserRepository(context);
         
         var response = userRepo.Update(new Core.UserUpdateDTO(0, "", ""));
@@ -55,6 +59,7 @@ public class UserRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var userRepo = new UserRepository(context);
         var taskRepo = new TaskRepository(context);
         var user = userRepo.Create(new Core.UserCreateDTO("username", "email"));
@@ -70,6 +75,7 @@ public class UserRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var userRepo = new UserRepository(context);
         var taskRepo = new TaskRepository(context);
         var user = userRepo.Create(new Core.UserCreateDTO("username", "email"));
@@ -80,11 +86,12 @@ public class UserRepositoryTests
         response.Should().Be(Core.Response.Conflict);
     }
 
-        [Fact]
+    [Fact]
     public void SameEmailTwiceReturnsConflict() {
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var userRepo = new UserRepository(context);
         
         userRepo.Create(new Core.UserCreateDTO("username", "email"));
@@ -92,5 +99,19 @@ public class UserRepositoryTests
         var response = user.Response;
 
         response.Should().Be(Core.Response.Conflict);
+    }
+
+    [Fact]
+    public void UserCreatedReturnsCreated() {
+
+        var factory = new KanbanContextFactory();
+        var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
+        var userRepo = new UserRepository(context);
+        
+        var user = userRepo.Create(new Core.UserCreateDTO("username", "email"));
+        var response = user.Response;
+
+        response.Should().Be(Core.Response.Created);
     }
 }
