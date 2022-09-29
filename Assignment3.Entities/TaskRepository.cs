@@ -17,15 +17,10 @@ public class TaskRepository : ITaskRepository
     public (Response Response, int TaskId) Create(TaskCreateDTO task)
     {   
 
-        var tagRepo = new TagRepository(_context);
-        var tags = new List<Tag>();
-        foreach(var tag in task.Tags) {
-            var tagInfo = tagRepo.Create(new TagCreateDTO(tag));
-            var tagEntity = _context.Tags.SingleOrDefault(t => t.Id == tagInfo.TagId);
-            if (tagEntity != null) tags.Add(tagEntity);
-        }
+        var tags = from tag in _context.Tags where task.Tags.Contains(tag.Name) select tag;
+        var tagList = tags.ToList();
 
-        User assignedTo = null!;
+        User assignedTo = new User();
         if (task.AssignedToId != null) {
             assignedTo = _context.Users.Find(task.AssignedToId)!;
             if (assignedTo == null) return (Response.BadRequest, 0);
@@ -37,7 +32,7 @@ public class TaskRepository : ITaskRepository
             Description = task.Description!,
             Title = task.Title,
             State = State.New,
-            Tags = tags,
+            Tags = tagList,
             AssignedTo = assignedTo
         };
         
@@ -49,23 +44,20 @@ public class TaskRepository : ITaskRepository
 
     public IReadOnlyCollection<TaskDTO> ReadAll()
     {
-        var queryResult = _context.Tasks
-            .Include(t => t.AssignedTo)
-            .Include(t => t.Tags)
-            .ToList();
-        var taskDTOs = queryResult.Select(task => new TaskDTO(task.Id, task.Title, task.AssignedTo.Name,
-            task.Tags.Select(t => t.Name).ToImmutableList(), task.State)).ToImmutableList();
-        return taskDTOs;
+        var queryResult = _context.Tasks.ToList();
+
+        var taskDTOs = from t in _context.Tasks 
+            select new TaskDTO(t.Id, t.Title, t.AssignedTo.Name, t.Tags.Select(tag => tag.Name).ToImmutableList(), t.State);
+
+        
+        return taskDTOs.ToList().AsReadOnly();
 
     }
 
     public IReadOnlyCollection<TaskDTO> ReadAllRemoved()
     {
-        var queryResult = _context.Tasks
-            .Include(t => t.AssignedTo)
-            .Include(t => t.Tags)
-            .Where(t => t.State == State.Removed)
-            .ToList();
+        var queryResult = _context.Tasks.Where(t => t.State == State.Removed).ToList();
+        
         var taskDTOs = queryResult.Select(task => new TaskDTO(task.Id, task.Title, task.AssignedTo.Name,
             task.Tags.Select(t => t.Name).ToImmutableList(), task.State)).ToImmutableList();
         return taskDTOs;

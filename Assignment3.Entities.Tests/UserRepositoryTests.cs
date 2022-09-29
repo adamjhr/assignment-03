@@ -133,4 +133,25 @@ public class UserRepositoryTests
 
         response.Should().Be(( user.UserId, "newname", "newmail" ));
     }
+
+    [Fact]
+    public void UserReadAllReturns5Users() {
+
+        var factory = new KanbanContextFactory();
+        var context = factory.CreateDbTestContext(new string[] {});
+        context.Database.EnsureDeleted();
+        var userRepo = new UserRepository(context);
+        userRepo.Create(new Core.UserCreateDTO("username", "email"));
+        userRepo.Create(new Core.UserCreateDTO("username", "email2"));
+        userRepo.Create(new Core.UserCreateDTO("username", "email3"));
+        userRepo.Create(new Core.UserCreateDTO("username", "email4"));
+        userRepo.Create(new Core.UserCreateDTO("username", "email5"));
+        var user = userRepo.Create(new Core.UserCreateDTO("username", "email6"));
+        userRepo.Delete(user.UserId);
+
+        var readAll = userRepo.ReadAll();
+        var count = readAll.Count();
+
+        count.Should().Be(5);
+    }
 }
