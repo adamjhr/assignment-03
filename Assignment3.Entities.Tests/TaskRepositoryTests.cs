@@ -8,6 +8,7 @@ public class TaskRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
         
@@ -21,6 +22,7 @@ public class TaskRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
         
@@ -34,6 +36,7 @@ public class TaskRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
 
         var expectedTime = DateTime.UtcNow;
@@ -49,6 +52,7 @@ public class TaskRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
 
         var expectedTime = DateTime.UtcNow;
@@ -62,6 +66,7 @@ public class TaskRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
         
@@ -80,6 +85,7 @@ public class TaskRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
         taskRepo.Update(new Core.TaskUpdateDTO(task.TaskId, "testTask", null, null, new List<string> {}, state));
@@ -94,6 +100,7 @@ public class TaskRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
         taskRepo.Update(new Core.TaskUpdateDTO(task.TaskId, "testTask", null, null, new List<string> {}, Core.State.Active));
@@ -109,6 +116,7 @@ public class TaskRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
         taskRepo.Update(new Core.TaskUpdateDTO(task.TaskId, "testTask", null, null, new List<string> {}, Core.State.Active));
@@ -124,6 +132,7 @@ public class TaskRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
         taskRepo.Update(new Core.TaskUpdateDTO(task.TaskId, "testTask", null, null, new List<string> {}, Core.State.Resolved));
@@ -138,6 +147,7 @@ public class TaskRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
         taskRepo.Update(new Core.TaskUpdateDTO(task.TaskId, "testTask", null, null, new List<string> {}, Core.State.Closed));
@@ -152,6 +162,7 @@ public class TaskRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", 1, null, new List<string> {}));
@@ -167,6 +178,7 @@ public class TaskRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         
         var response = taskRepo.Delete(0);
@@ -179,6 +191,7 @@ public class TaskRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         
         var response = taskRepo.Update(new Core.TaskUpdateDTO(0, "testTask", null, null, new List<string> {}, Core.State.Closed));
@@ -191,6 +204,7 @@ public class TaskRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         
         var response = taskRepo.Read(0);

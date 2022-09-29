@@ -9,6 +9,7 @@ public class TagRepositoryTests
         
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         TagRepository tagRepo = new TagRepository(context);
 
         var response = tagRepo.Delete(1);
@@ -22,6 +23,7 @@ public class TagRepositoryTests
         
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         TagRepository tagRepo = new TagRepository(context);
 
         var response = tagRepo.Read(1);
@@ -35,6 +37,7 @@ public class TagRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         TagRepository tagRepo = new TagRepository(context);
         TaskRepository taskRepo = new TaskRepository(context);
         var tag = tagRepo.Create(new Core.TagCreateDTO("testTag"));
@@ -51,6 +54,7 @@ public class TagRepositoryTests
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         TagRepository tagRepo = new TagRepository(context);
         TaskRepository taskRepo = new TaskRepository(context);
         var tag = tagRepo.Create(new Core.TagCreateDTO("testTag"));
@@ -66,6 +70,7 @@ public class TagRepositoryTests
     public void CreateSameTagTwiceReturnsConflict() {
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
         TagRepository tagRepo = new TagRepository(context);
         tagRepo.Create(new Core.TagCreateDTO("testTag"));
         
