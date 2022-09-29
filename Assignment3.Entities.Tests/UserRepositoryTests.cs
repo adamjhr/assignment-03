@@ -114,4 +114,35 @@ public class UserRepositoryTests
 
         response.Should().Be(Core.Response.Created);
     }
+
+    [Fact]
+    public void UserReadReturnsCorrectData() {
+
+        var factory = new KanbanContextFactory();
+        var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
+        var userRepo = new UserRepository(context);
+        var user = userRepo.Create(new Core.UserCreateDTO("username", "email"));
+        
+        var readUser = userRepo.Read(user.UserId);
+        var response = ( readUser.Id, readUser.Name, readUser.Email );
+
+        response.Should().Be(( user.UserId, "username", "email" ));
+    }
+
+    [Fact]
+    public void UserReadAfterUpdateReturnsCorrectData() {
+
+        var factory = new KanbanContextFactory();
+        var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
+        var userRepo = new UserRepository(context);
+        var user = userRepo.Create(new Core.UserCreateDTO("username", "email"));
+        userRepo.Update(new Core.UserUpdateDTO(user.UserId, "newname", "newmail"));
+        
+        var readUser = userRepo.Read(user.UserId);
+        var response = ( readUser.Id, readUser.Name, readUser.Email );
+
+        response.Should().Be(( user.UserId, "newname", "newmail" ));
+    }
 }
