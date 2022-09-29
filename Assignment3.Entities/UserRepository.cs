@@ -25,7 +25,12 @@ public class UserRepository : IUserRepository
         return (Response.Created, userEntity.Id);
     }
 
-    public IReadOnlyCollection<UserDTO> ReadAll() => throw new NotImplementedException();
+    public IReadOnlyCollection<UserDTO> ReadAll() {
+        var queryResult = _context.Users.ToList();
+        var userDTOs = queryResult.Select(user => new UserDTO(user.Id, user.Name, user.Email)).ToImmutableList();
+        return userDTOs;
+    }
+
     public UserDTO Read(int userId) {
 
         var user = from u in _context.Users where u.Id == userId select new UserDTO( u.Id, u.Name, u.Email );
@@ -36,14 +41,15 @@ public class UserRepository : IUserRepository
     }
     public Response Update(UserUpdateDTO user) {
 
-        throw new NotImplementedException();
+        var userEntity = _context.Users.Find(user.Id);
 
-        // var findUser = from u in _context.Users where u.Id == user.Id select u.Id;
-        // _context.Users.Update()
+        if (userEntity == null) return Response.NotFound;
 
-        // if (user.Count() == 0) return Response.NotFound!;
-
-
+        userEntity.Email = user.Email;
+        userEntity.Name = user.Name;
+        
+        _context.SaveChanges();
+        return Response.Updated;
     }
 
     public Response Delete(int userId, bool force = false) {
@@ -63,7 +69,6 @@ public class UserRepository : IUserRepository
 
         _context.Users.Remove(query);
         _context.SaveChanges();
-            
 
         return Response.Deleted;
 

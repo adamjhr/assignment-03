@@ -99,7 +99,7 @@ public class TaskRepositoryTests
     public void UpdateStateToResolvedeReturnsResolved() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null!);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
@@ -114,7 +114,7 @@ public class TaskRepositoryTests
     public void UpdateStateToActiveReturnsActive() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
@@ -129,7 +129,7 @@ public class TaskRepositoryTests
     public void UpdateStateToClosedReturnsClosed() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
@@ -144,7 +144,7 @@ public class TaskRepositoryTests
     public void DeleteWithStateActiveSetsStateToRemoved() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
@@ -160,7 +160,7 @@ public class TaskRepositoryTests
     public void DeleteWithStateRemovedReturnsConflict() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
@@ -176,7 +176,7 @@ public class TaskRepositoryTests
     public void DeleteWithStateResolvedReturnsConflict() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
@@ -191,7 +191,7 @@ public class TaskRepositoryTests
     public void DeleteWithStateClosedReturnsConflict() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
@@ -206,7 +206,7 @@ public class TaskRepositoryTests
     public void AssignNonExistantUserGivesBadRequest() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         
@@ -220,7 +220,7 @@ public class TaskRepositoryTests
     public void DeleteNonExistantReturnsNotFound() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         
@@ -233,7 +233,7 @@ public class TaskRepositoryTests
     public void UpdateNonExistantReturnsNotFound() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         
@@ -246,7 +246,7 @@ public class TaskRepositoryTests
     public void ReadNonExistantReturnsNull() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         

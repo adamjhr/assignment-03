@@ -2,11 +2,12 @@ namespace Assignment3.Entities.Tests;
 
 public class UserRepositoryTests
 {
+
     [Fact]
     public void ReadNonExistantReturnsNull() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var userRepo = new UserRepository(context);
         
@@ -19,7 +20,7 @@ public class UserRepositoryTests
     public void UpdateNonExistantReturnsNonFound() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var userRepo = new UserRepository(context);
         
@@ -32,7 +33,7 @@ public class UserRepositoryTests
     public void DeleteNonExistantReturnsNotFound() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var userRepo = new UserRepository(context);
         
@@ -42,23 +43,10 @@ public class UserRepositoryTests
     }
 
     [Fact]
-    public void UpdateNonExistantReturnsNotFound() {
-
-        var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
-        context.Database.EnsureDeleted();
-        var userRepo = new UserRepository(context);
-        
-        var response = userRepo.Update(new Core.UserUpdateDTO(0, "", ""));
-
-        response.Should().Be(Core.Response.NotFound);
-    }
-
-    [Fact]
     public void ForceDeleteUserInUseReturnsDeleted() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var userRepo = new UserRepository(context);
         var taskRepo = new TaskRepository(context);
@@ -74,7 +62,7 @@ public class UserRepositoryTests
     public void NoForceDeleteUserInUseReturnsConflict() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var userRepo = new UserRepository(context);
         var taskRepo = new TaskRepository(context);
@@ -90,7 +78,7 @@ public class UserRepositoryTests
     public void SameEmailTwiceReturnsConflict() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var userRepo = new UserRepository(context);
         
@@ -105,7 +93,7 @@ public class UserRepositoryTests
     public void UserCreatedReturnsCreated() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var userRepo = new UserRepository(context);
         
@@ -119,7 +107,7 @@ public class UserRepositoryTests
     public void UserReadReturnsCorrectData() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var userRepo = new UserRepository(context);
         var user = userRepo.Create(new Core.UserCreateDTO("username", "email"));
@@ -134,7 +122,7 @@ public class UserRepositoryTests
     public void UserReadAfterUpdateReturnsCorrectData() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         var userRepo = new UserRepository(context);
         var user = userRepo.Create(new Core.UserCreateDTO("username", "email"));

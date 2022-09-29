@@ -8,12 +8,12 @@ public class User
     public int Id { get; set; }
     
     [StringLength(100),Required]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     
     // Den mangler unique
     [StringLength(100),Required]
-    public string Email { get; set; }
+    public string Email { get; set; } = null!;
 
-    public virtual ICollection<Task> Tasks { get; set; }
+    public virtual ICollection<Task> Tasks { get; set; } = null!;
 
 }

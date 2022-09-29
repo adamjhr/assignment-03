@@ -31,8 +31,7 @@ public class TaskRepository : ITaskRepository
             if (assignedTo == null) return (Response.BadRequest, 0);
         }
 
-        var t = _context.Tasks.Add(new Task
-        {
+        var taskEntity = new Task {
             CreatedDate = DateTime.Now,
             StateUpdated = DateTime.Now,
             Description = task.Description!,
@@ -40,9 +39,11 @@ public class TaskRepository : ITaskRepository
             State = State.New,
             Tags = tags,
             AssignedTo = assignedTo
-        });
+        };
+        
+        _context.Tasks.Add(taskEntity);
         _context.SaveChanges();
-        return (Response.Created, t.Entity.Id);
+        return (Response.Created, taskEntity.Id);
     
     }
 
@@ -74,7 +75,8 @@ public class TaskRepository : ITaskRepository
     {
         
         var queryResult = _context.Tags.Include(t => t.Tasks).SingleOrDefault(t => t.Name == tag);
-        
+
+        if (queryResult == null) return null!;
 
         var taskDTOs = queryResult.Tasks.Select(task => new TaskDTO(task.Id, task.Title, task.AssignedTo.Name,
             task.Tags.Select(t => t.Name).ToImmutableList(), task.State)).ToImmutableList();
@@ -87,6 +89,7 @@ public class TaskRepository : ITaskRepository
     {
         var queryResult = _context.Users.Include(u => u.Tasks).SingleOrDefault(u => u.Id == userId);
         
+        if (queryResult == null) return null!;
 
         var taskDTOs = queryResult.Tasks.Select(task => new TaskDTO(task.Id, task.Title, task.AssignedTo.Name,
             task.Tags.Select(t => t.Name).ToImmutableList(), task.State)).ToImmutableList();

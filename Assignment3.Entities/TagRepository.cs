@@ -18,10 +18,13 @@ public class TagRepository : ITagRepository
     public (Response Response, int TagId) Create(TagCreateDTO tag)
     {   
         var tagExists = from t in _context.Tags where t.Name == tag.Name select t;
-        if (tagExists.Count() != 0) return (Response.Conflict, tagExists.First().Id);
-        var newTag = _context.Tags.Add(new Tag{ Name = tag.Name });
+        if (tagExists.Any()) return (Response.Conflict, tagExists.First().Id);
+
+        var tagEntity = new Tag{ Name = tag.Name };
+        _context.Tags.Add(tagEntity);
         _context.SaveChanges();
-        return (Response.Created, newTag.Entity.Id);
+
+        return (Response.Created, tagEntity.Id);
 
     }
 
@@ -37,7 +40,7 @@ public class TagRepository : ITagRepository
     public TagDTO Read(int tagId)
     {
         var tag = _context.Tags.SingleOrDefault(t => t.Id == tagId);
-        if (tag == null) return null;
+        if (tag == null) return null!;
         
         return new TagDTO(tag.Id,tag.Name);
 
@@ -45,52 +48,46 @@ public class TagRepository : ITagRepository
 
     public Response Update(TagUpdateDTO tag)
     {
-        if (_context.Tags.Find(tag.Id) != null)
-        {
-            _context.Tags.Find(tag.Id).Name = tag.Name;
-            _context.Tags.Find(tag.Id).Id = tag.Id;
-            _context.SaveChanges();
-            return Response.Updated;
-        }
 
-        return Response.NotFound;
+        var tagEntity = _context.Tags.Find(tag.Id);
+
+        if (tagEntity == null) return Response.NotFound;
+
+        tagEntity.Name = tag.Name;
         
+        _context.SaveChanges();
+        return Response.Updated;
     }
 
     public Response Delete(int tagId, bool force = false)
     {
-        //var tag = _context.Tags.Include(t => t.Tasks ).SingleOrDefault(t => t.Id == tagId );
-        var tag = _context.Tags.Find(tagId);
-        if (_context.Tags.Count() != 0) return Response.BadRequest;
+        var tag = _context.Tags.Include(t => t.Tasks ).SingleOrDefault(t => t.Id == tagId );
+        //var tag = _context.Tags.Find(tagId);
         
         if (tag == null)
             return Response.NotFound;
         
-        var tasks = from t in _context.Tasks where t.Tags.Contains(tag) select t;
-
-        if (tasks.Count() != 0 && !force)
+        if (tag.Tasks.Any() && !force)
             return Response.Conflict;
 
-        
         if (force)
         {
-            foreach (var t in tasks)
+            foreach (var t in tag.Tasks)
             {
                 if (t.State == State.Active)
                     return Response.Conflict;
 
             }
-            foreach (var t in tasks)
+            foreach (var t in tag.Tasks)
             {
-                //t.Tags.Remove(tag);
+                t.Tags.Remove(tag);
             }
         }
 
         _context.Tags.Remove(tag);
         _context.SaveChanges();
             
-        return Response.NotFound;
-            
+        return Response.Deleted;
         
     }
 }

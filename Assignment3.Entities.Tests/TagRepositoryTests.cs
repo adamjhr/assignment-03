@@ -8,7 +8,7 @@ public class TagRepositoryTests
     public void DeleteNonExistantEntityReturnsNotFound() {
         
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         TagRepository tagRepo = new TagRepository(context);
 
@@ -22,7 +22,7 @@ public class TagRepositoryTests
     public void ReadNonExistantReturnsNull() {
         
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         TagRepository tagRepo = new TagRepository(context);
 
@@ -36,7 +36,7 @@ public class TagRepositoryTests
     public void TagAssignedToTaskReturnsConflict() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         TagRepository tagRepo = new TagRepository(context);
         TaskRepository taskRepo = new TaskRepository(context);
@@ -50,17 +50,30 @@ public class TagRepositoryTests
     }
 
     [Fact]
-    public void TagAssignedToTaskReturnsDeletedWhenForced() {
+    public void DeleteTagReturnsDeleted() {
 
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         TagRepository tagRepo = new TagRepository(context);
-        TaskRepository taskRepo = new TaskRepository(context);
         var tag = tagRepo.Create(new Core.TagCreateDTO("testTag"));
-        taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> { "testTag" }));
     
-        var response = tagRepo.Delete(tag.TagId, true);
+        var response = tagRepo.Delete(tag.TagId);
+
+        response.Should().Be(Core.Response.Deleted);
+    
+    }
+
+    [Fact]
+    public void DeleteTagReturnsDeleted2() {
+
+        var factory = new KanbanContextFactory();
+        var context = factory.CreateDbTestContext(new string[] {});
+        context.Database.EnsureDeleted();
+        TagRepository tagRepo = new TagRepository(context);
+        var tag = tagRepo.Create(new Core.TagCreateDTO("testTag"));
+    
+        var response = tagRepo.Delete(tag.TagId);
 
         response.Should().Be(Core.Response.Deleted);
     
@@ -69,7 +82,7 @@ public class TagRepositoryTests
     [Fact]
     public void CreateSameTagTwiceReturnsConflict() {
         var factory = new KanbanContextFactory();
-        var context = factory.CreateDbTestContext(null);
+        var context = factory.CreateDbTestContext(new string[] {});
         context.Database.EnsureDeleted();
         TagRepository tagRepo = new TagRepository(context);
         tagRepo.Create(new Core.TagCreateDTO("testTag"));

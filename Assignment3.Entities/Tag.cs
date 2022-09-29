@@ -8,7 +8,7 @@ public class Tag
     
     //Mangler unique
     [StringLength(50),Required]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
     
-    public virtual ICollection<Task> Tasks { get; set; }
+    public virtual ICollection<Task> Tasks { get; set; } = null!;
 }
