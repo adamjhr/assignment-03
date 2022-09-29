@@ -15,13 +15,31 @@ public class TaskRepository : ITaskRepository
     }
 
     public (Response Response, int TaskId) Create(TaskCreateDTO task)
-    {
-        if (_context.Tasks.Find(task) != null) return (Response.Conflict, 0);
-        
+    {   
+
+        var tagRepo = new TagRepository(_context);
+        var tags = new List<Tag>();
+        foreach(var tag in task.Tags) {
+            var tagInfo = tagRepo.Create(new TagCreateDTO(tag));
+            var tagEntity = _context.Tags.SingleOrDefault(t => t.Id == tagInfo.TagId);
+            if (tagEntity != null) tags.Add(tagEntity);
+        }
+
+        User assignedTo = null!;
+        if (task.AssignedToId != null) {
+            assignedTo = _context.Users.Find(task.AssignedToId)!;
+            if (assignedTo == null) return (Response.BadRequest, 0);
+        }
+
         var t = _context.Tasks.Add(new Task
         {
             CreatedDate = DateTime.Now,
-            StateUpdated = DateTime.Now
+            StateUpdated = DateTime.Now,
+            Description = task.Description!,
+            Title = task.Title,
+            State = State.New,
+            Tags = tags,
+            AssignedTo = assignedTo
         });
         _context.SaveChanges();
         return (Response.Created, t.Entity.Id);
@@ -91,11 +109,13 @@ public class TaskRepository : ITaskRepository
 
     public TaskDetailsDTO Read(int taskId)
     {
-        var task = _context.Tasks.Include(t => t.AssignedTo).Include(t => t.Tags).SingleOrDefault(t => t.Id == taskId);
-        if (task == null) return null;
+        //var task = _context.Tasks.Include(t => t.AssignedTo).Include(t => t.Tags).SingleOrDefault(t => t.Id == taskId);
+        var task = _context.Tasks.Find(taskId);
+        if (task == null) return null!;
         
-        var userName = task.AssignedTo.Name;
-        
+        //var userName = task.AssignedTo.Name;
+        var userName = "";
+
         return new TaskDetailsDTO(task.Id, task.Title, task.Description, task.CreatedDate, userName, task.Tags.Select(tag => tag.Name).ToImmutableList(),
             task.State, task.StateUpdated);
         
@@ -104,17 +124,26 @@ public class TaskRepository : ITaskRepository
 
     public Response Update(TaskUpdateDTO task)
     {
-        var query = _context.Tasks.Include(t => t.Tags).SingleOrDefault(t => t.Id == task.Id);
-        
+        //var query = _context.Tasks.Include(t => t.Tags).SingleOrDefault(t => t.Id == task.Id);
+        var query = _context.Tasks.Find(task.Id);
+
+
         if (query == null) 
             return Response.NotFound;
         
-        query.Description = task.Description;
+        query.Description = task.Description!;
         query.Title = task.Title;
-        query.AssignedTo = _context.Users.Find(task.AssignedToId);
-        if (query.AssignedTo == null) return Response.BadRequest;
-        if (query.State != task.State) 
+
+        if (task.AssignedToId != null) {
+            query.AssignedTo = _context.Users.Find(task.AssignedToId)!;
+            if (query.AssignedTo == null) return Response.BadRequest;
+        }
+
+        if (query.State != task.State) {
             query.StateUpdated = DateTime.Now;
+        }
+
+        query.State = task.State;
 
         foreach (var tag in task.Tags.Except(query.Tags.Select(t => t.Name)))
             query.Tags.Add(_context.Tags.Single(t => t.Name == tag));

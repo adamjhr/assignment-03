@@ -10,19 +10,19 @@ public class Task
     public int Id { get; set; }
     
     [StringLength(100),Required]
-    public string Title { get; set; }
+    public string Title { get; set; } = null!;
     
     [MaxLength]
-    public string Description { get; set; }
+    public string Description { get; set; } = null!;
     
     [Required]
     public State State { get; set; }
 
-    public virtual ICollection<Tag> Tags { get; set; }
+    public virtual ICollection<Tag> Tags { get; set; } = null!;
     
     public DateTime CreatedDate { get; set; }
 
     public  DateTime StateUpdated { get; set; }
     
-    public User AssignedTo { get; set; }
+    public User AssignedTo { get; set; } = null!;
 }

@@ -1,4 +1,6 @@
 using Assignment3.Core;
+using System.Collections.Immutable;
+using Microsoft.EntityFrameworkCore;
 
 namespace Assignment3.Entities;
 
@@ -44,6 +46,27 @@ public class UserRepository : IUserRepository
 
     }
 
-    public Response Delete(int userId, bool force = false) => throw new NotImplementedException();
+    public Response Delete(int userId, bool force = false) {
+
+        var query = _context.Users.Find(userId);
+        if (query == null) return Response.NotFound;
+
+        var tasksWithUser = from t in _context.Tasks where t.AssignedTo.Id == userId select t;
+
+        if (!force && tasksWithUser.Count() != 0) {
+            return Response.Conflict;
+        }
+
+        foreach(var task in tasksWithUser) {
+            task.AssignedTo = null!;
+        }
+
+        _context.Users.Remove(query);
+        _context.SaveChanges();
+            
+
+        return Response.Deleted;
+
+    }
 }
  

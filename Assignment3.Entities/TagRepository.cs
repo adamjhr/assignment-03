@@ -17,10 +17,11 @@ public class TagRepository : ITagRepository
 
     public (Response Response, int TagId) Create(TagCreateDTO tag)
     {   
-        if (_context.Tags.Find(tag) != null) return (Response.Conflict, 0);
-        var t = _context.Tags.Add(new Tag());
+        var tagExists = from t in _context.Tags where t.Name == tag.Name select t;
+        if (tagExists.Count() != 0) return (Response.Conflict, tagExists.First().Id);
+        var newTag = _context.Tags.Add(new Tag{ Name = tag.Name });
         _context.SaveChanges();
-        return (Response.Created, t.Entity.Id);
+        return (Response.Created, newTag.Entity.Id);
 
     }
 
@@ -58,35 +59,38 @@ public class TagRepository : ITagRepository
 
     public Response Delete(int tagId, bool force = false)
     {
-        var tag = _context.Tags.Include(t => t.Tasks ).SingleOrDefault(t => t.Id == tagId );
+        //var tag = _context.Tags.Include(t => t.Tasks ).SingleOrDefault(t => t.Id == tagId );
+        var tag = _context.Tags.Find(tagId);
+        if (_context.Tags.Count() != 0) return Response.BadRequest;
+        
         if (tag == null)
             return Response.NotFound;
+        
+        var tasks = from t in _context.Tasks where t.Tags.Contains(tag) select t;
 
-        if (tag.Tasks.Any() && !force)
+        if (tasks.Count() != 0 && !force)
             return Response.Conflict;
 
         
         if (force)
         {
-            foreach (var t in tag.Tasks)
+            foreach (var t in tasks)
             {
                 if (t.State == State.Active)
                     return Response.Conflict;
 
             }
-            foreach (var t in tag.Tasks)
+            foreach (var t in tasks)
             {
-                t.Tags.Remove(tag);
+                //t.Tags.Remove(tag);
             }
         }
 
         _context.Tags.Remove(tag);
-                _context.SaveChanges();
+        _context.SaveChanges();
             
-
-            return Response.NotFound;
+        return Response.NotFound;
             
-
         
     }
 }

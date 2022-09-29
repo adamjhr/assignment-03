@@ -39,7 +39,7 @@ public class TaskRepositoryTests
         context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
 
-        var expectedTime = DateTime.UtcNow;
+        var expectedTime = DateTime.Now;
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
         var response = taskRepo.Read(task.TaskId).Created;
 
@@ -55,7 +55,7 @@ public class TaskRepositoryTests
         context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
 
-        var expectedTime = DateTime.UtcNow;
+        var expectedTime = DateTime.Now;
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
         var response = taskRepo.Read(task.TaskId).StateUpdated;
 
@@ -70,29 +70,74 @@ public class TaskRepositoryTests
         var taskRepo = new TaskRepository(context);
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
         
-        var expectedTime = DateTime.UtcNow;
+        var expectedTime = DateTime.Now;
         taskRepo.Update(new Core.TaskUpdateDTO(task.TaskId, "testTask", null, null, new List<string> {}, Core.State.Active));
         var response = taskRepo.Read(task.TaskId).StateUpdated;
 
         response.Should().BeCloseTo(expectedTime, TimeSpan.FromSeconds(5));
     }
 
-    [Theory]
-    [InlineData(Core.State.Active)]
-    [InlineData(Core.State.Closed)]
-    [InlineData(Core.State.Resolved)]
-    public void UpdateStateReturnsCorrectState(Core.State state) {
+    // [Theory]
+    // [InlineData(Core.State.Active)]
+    // [InlineData(Core.State.Closed)]
+    // [InlineData(Core.State.Resolved)]
+    // public void UpdateStateReturnsCorrectState(Core.State state) {
+
+    //     var factory = new KanbanContextFactory();
+    //     var context = factory.CreateDbTestContext(null);
+    //     context.Database.EnsureDeleted();
+    //     var taskRepo = new TaskRepository(context);
+    //     var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
+    //     var updated = taskRepo.Update(new Core.TaskUpdateDTO(task.TaskId, "testTask", null, null, new List<string> {}, state));
+        
+    //     var response = taskRepo.Read(task.TaskId).State;
+
+    //     response.Should().Be(state);
+    // }
+
+    [Fact]
+    public void UpdateStateToResolvedeReturnsResolved() {
+
+        var factory = new KanbanContextFactory();
+        var context = factory.CreateDbTestContext(null!);
+        context.Database.EnsureDeleted();
+        var taskRepo = new TaskRepository(context);
+        var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
+        var updated = taskRepo.Update(new Core.TaskUpdateDTO(task.TaskId, "testTask", null, null, new List<string> {}, Core.State.Resolved));
+        
+        var response = taskRepo.Read(task.TaskId).State;
+
+        response.Should().Be(Core.State.Resolved);
+    }
+
+        [Fact]
+    public void UpdateStateToActiveReturnsActive() {
 
         var factory = new KanbanContextFactory();
         var context = factory.CreateDbTestContext(null);
         context.Database.EnsureDeleted();
         var taskRepo = new TaskRepository(context);
         var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
-        taskRepo.Update(new Core.TaskUpdateDTO(task.TaskId, "testTask", null, null, new List<string> {}, state));
+        var updated = taskRepo.Update(new Core.TaskUpdateDTO(task.TaskId, "testTask", null, null, new List<string> {}, Core.State.Active));
         
         var response = taskRepo.Read(task.TaskId).State;
 
-        response.Should().Be(state);
+        response.Should().Be(Core.State.Active);
+    }
+
+        [Fact]
+    public void UpdateStateToClosedReturnsClosed() {
+
+        var factory = new KanbanContextFactory();
+        var context = factory.CreateDbTestContext(null);
+        context.Database.EnsureDeleted();
+        var taskRepo = new TaskRepository(context);
+        var task = taskRepo.Create(new Core.TaskCreateDTO("testTask", null, null, new List<string> {}));
+        var updated = taskRepo.Update(new Core.TaskUpdateDTO(task.TaskId, "testTask", null, null, new List<string> {}, Core.State.Closed));
+        
+        var response = taskRepo.Read(task.TaskId).State;
+
+        response.Should().Be(Core.State.Closed);
     }
 
     [Fact]
@@ -171,8 +216,6 @@ public class TaskRepositoryTests
         response.Should().Be(Core.Response.BadRequest);
     }
     
-    // Something about allowing for editing tasks?
-
     [Fact]
     public void DeleteNonExistantReturnsNotFound() {
 
